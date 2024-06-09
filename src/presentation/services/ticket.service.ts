@@ -12,6 +12,50 @@ export class TicketService {
         { id: UuidAdapter.v4(), number: 6, createdAt: new Date(), done: false },
     ];
 
+    public get pendingTickets(): Ticket[] {
+        // return this.tickets.filter( ticket => ticket.done == false );
+        return this.tickets.filter( ticket => !ticket.handleAtDesk );
+    }
+
+    public lastTicketNumber(): number {
+        // const ticketsSize = this.tickets.length;
+        // return this.tickets.filter( ticket => ticket.number == ticketsSize);
+        return this.tickets.length > 0 ? this.tickets.at(-1)!.number : 0;
+    }
+
+    public createTicket() {
+        const ticket: Ticket = { id: UuidAdapter.v4(), number: this.lastTicketNumber() + 1, createdAt: new Date(), done: false };
+        this.tickets.push(ticket);
+        // TODO: WS
+        return ticket;
+    }
+
+    public drawTicket(desk: string) {
+        const ticket = this.tickets.find( t => !t.handleAtDesk );
+        if ( !ticket ) return { status: 'No pending', message: 'No tickets pending' }
+
+        ticket.handleAtDesk = desk;
+        ticket.handleAt = new Date();
+
+        // TODO WS
+        return { status: 'ok', ticket };
+    }
+
+    public onFinishedTicket(id: string) {
+
+        const ticket = this.tickets.find( ticket => ticket.id === id);
+        if ( !ticket ) return { status: 'Error', message: 'Ticket not found' }
+
+        this.tickets.map( ticket => {
+            if ( ticket.id === id ) {
+                ticket.done = true;
+            }
+            return ticket;
+        });
+
+        return { status: 'ok' }
+    }
+
 }
 
 
