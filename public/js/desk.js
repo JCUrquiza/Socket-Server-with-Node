@@ -1,11 +1,34 @@
 
 // Referencias HTML
 const lblPending = document.querySelector('#lbl-pending');
+const deskHeader = document.querySelector('h1');
+const noMoreAlert = document.querySelector('.alert');
 
+
+
+const searchParams = new URLSearchParams( window.location.search );
+if ( !searchParams.has('escritorio') ) {
+    window.location = 'index.html';
+    throw new Error('Escritorio es requerido');
+}
+
+const deskNumber = searchParams.get('escritorio');
+deskHeader.innerHTML = deskNumber;
+
+
+function checkTicketCount( currentCount = 0 ) {
+    // noMoreAlert.classList.toggle('d-none');
+    if ( currentCount === 0 ) {
+        noMoreAlert.classList.remove('d-none');
+    } else {
+        noMoreAlert.classList.add('d-none');
+    }
+    lblPending.innerHTML = currentCount;
+}
 
 async function loadInitialCount() {
-    const pending = await fetch('/api/ticket/pending').then(resp => resp.json() );
-    lblPending.innerHTML = pending.length || 0 ;
+    const pendingTickets = await fetch('/api/ticket/pending').then(resp => resp.json() );
+    checkTicketCount( pendingTickets.length );
 }
 
 function connectToWebSockets() {
@@ -16,7 +39,7 @@ function connectToWebSockets() {
         // console.log(event.data);    // on-ticket-count-changed
         const {type, payload} = JSON.parse( event.data );
         if (type !== 'on-ticket-count-changed') return;
-        lblPending.innerHTML = payload;
+        checkTicketCount(payload);
     };
   
     socket.onclose = ( event ) => {
