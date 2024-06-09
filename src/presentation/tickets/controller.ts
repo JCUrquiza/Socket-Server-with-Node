@@ -21,7 +21,7 @@ export class TicketController {
     }
 
     public createTicket = async(req: Request, res: Response) => {
-        res.status(201).json( this.ticketService.createTicket );
+        res.status(201).json( this.ticketService.createTicket() );
     }
 
     public drawTicket = async(req: Request, res: Response) => {
