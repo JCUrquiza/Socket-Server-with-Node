@@ -8,7 +8,7 @@ export class TicketService {
         private readonly wwsService = WssService.instance,
     ) {}
 
-    public readonly tickets: Ticket[] = [
+    public tickets: Ticket[] = [
         { id: UuidAdapter.v4(), number: 1, createdAt: new Date(), done: false },
         { id: UuidAdapter.v4(), number: 2, createdAt: new Date(), done: false },
         { id: UuidAdapter.v4(), number: 3, createdAt: new Date(), done: false },
@@ -26,7 +26,7 @@ export class TicketService {
     }
     
     public get lastWorkingOnTickets(): Ticket[] {
-        return this.workingOnTickets.splice(0, 4);
+        return this.workingOnTickets.slice(0, 4);
     }
 
     public get lastTicketNumber(): number {
@@ -64,7 +64,7 @@ export class TicketService {
         const ticket = this.tickets.find( ticket => ticket.id === id);
         if ( !ticket ) return { status: 'Error', message: 'Ticket not found' }
 
-        this.tickets.map( ticket => {
+        this.tickets = this.tickets.map( ticket => {
             if ( ticket.id === id ) {
                 ticket.done = true;
             }
